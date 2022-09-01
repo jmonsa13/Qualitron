@@ -15,7 +15,7 @@ from functions.select_files import find_type_files, find_day_files, find_range_d
 # ----------------------------------------------------------------------------------------------------------------------
 # Functions
 # ----------------------------------------------------------------------------------------------------------------------
-def read_qualitron_files_product(source_dir, folder, type_file='PartialStat', info_date='range_test',
+def read_qualitron_files_product(source_dir, folder, planta, qualitron, type_file='PartialStat', info_date='range_test',
                                  day_filter_ini='20_05_2022', day_filter_fin='05_06_2022'):
     # Path
     format_path = os.path.join(source_dir, folder)
@@ -36,10 +36,9 @@ def read_qualitron_files_product(source_dir, folder, type_file='PartialStat', in
     general_data = []
     quality_data = []
 
-    # Row assign
-    row_data = 20
-
     for filename in files_filter:
+        print(filename)
+
         # Flag to avoid capture general data
         flag_datos_gen = True
 
@@ -72,7 +71,7 @@ def read_qualitron_files_product(source_dir, folder, type_file='PartialStat', in
                             calidad_str = lines[j].split()[0]
                             calidad_und = int(lines[j].split()[-1])
 
-                            general_data.append([fecha, folder, tone, calidad_str, calidad_und])
+                            general_data.append([fecha, planta, qualitron, folder, tone, calidad_str, calidad_und])
                     elif flag_datos_gen is True:
                         flag_datos_gen = False
 
@@ -86,7 +85,7 @@ def read_qualitron_files_product(source_dir, folder, type_file='PartialStat', in
                     calidad_str = " ".join(lines[j].split()[0:2])
                     calidad_und = int(lines[j].split()[-1])
 
-                    general_data.append([fecha, folder, tone, calidad_str, calidad_und])
+                    general_data.append([fecha, planta, qualitron, folder, tone, calidad_str, calidad_und])
 
                 new_start_i = i + start_i + 13
                 break  # Exit the for loop
@@ -110,7 +109,7 @@ def read_qualitron_files_product(source_dir, folder, type_file='PartialStat', in
                         calidad_und = int(lines[j].split()[-1].strip(')'))
 
                         # Saving the data
-                        quality_data.append([fecha, folder, calidad_type, calidad_str, calidad_und])
+                        quality_data.append([fecha, planta, qualitron, folder, calidad_type, calidad_str, calidad_und])
 
                         # Contador
                         j += 1
@@ -127,31 +126,60 @@ def read_qualitron_files_product(source_dir, folder, type_file='PartialStat', in
 # ----------------------------------------------------------------------------------------------------------------------
 # Executing CODE
 # ----------------------------------------------------------------------------------------------------------------------
-def qualitron_main():
+def qualitron_main(day_filter_ini, day_filter_fin, filename):
     # Collecting the data
     # ------------------------------------------------------------------------------------------------------------------
     # Empty list
     general_qual = []
     quality_qual = []
 
-    # Path of the folder
-    source_dir = ".\\data_qualitron"
-    # Format path inside
-    dirs = os.listdir(source_dir)
-    # Collecting the quality data of each format inside the source folder
-    for folder in dirs:
-        general, quality = read_qualitron_files_product(source_dir, folder, type_file='PartialStat',
-                                                        info_date='range_test', day_filter_ini='01_01_2022',
-                                                        day_filter_fin='31_12_2022')
-        # Joining the list
-        general_qual += general
-        quality_qual += quality
+    # Path of the main database
+    database_dir = ".\\00_Master_database\\Qualitron_Ruta.xlsx"
+
+    # Reading the souce database
+    source_df = pd.read_excel(database_dir)
+
+    # Keeping the row with connection
+    source_df = source_df[source_df['Red'] == 'Si']
+
+    # Looping to the different Qualitron by IP
+    for index, row in source_df.iterrows():
+
+        # Getting the planta and qualitron name
+        planta = row['Planta']
+        qualitron = row['Qualitron']
+
+        # Debugging message
+        print('------------------------------------------------------------------------------------------------------')
+        print('------------------------------------------------------------------------------------------------------')
+        print(planta)
+        print(qualitron)
+
+        # Folder inside the path
+        source_dir = row['Ruta'] + ':\\'
+        dirs = os.listdir(source_dir)
+
+        # Collecting the quality data of each format inside the source folder
+        for folder in dirs:
+            # Debugging message
+            print(folder)
+            print('-----------------------------------------------')
+
+            # Getting the info
+            general, quality = read_qualitron_files_product(source_dir, folder, planta, qualitron,
+                                                            type_file='PartialStat',
+                                                            info_date='range_test', day_filter_ini=day_filter_ini,
+                                                            day_filter_fin=day_filter_fin)
+            # Joining the list
+            general_qual += general
+            quality_qual += quality
+
 
     # Pandas dataframe creation
     # ------------------------------------------------------------------------------------------------------------------
     # Columns name
-    general_column = ['Fecha', 'Producto', 'Tono', 'Calidad', 'Valor_und']
-    quality_column = ['Fecha', 'Producto', 'Calidad', 'Defecto', 'Valor_und']
+    general_column = ['Fecha', 'Planta', 'Qualitron', 'Producto', 'Tono', 'Calidad', 'Valor_und']
+    quality_column = ['Fecha', 'Planta', 'Qualitron', 'Producto', 'Calidad', 'Defecto', 'Valor_und']
 
     # Creation of the Dataframe with general quality data
     df = pd.DataFrame(general_qual, columns=general_column)
@@ -162,7 +190,7 @@ def qualitron_main():
     # Export the dataframe to excel file
     # ------------------------------------------------------------------------------------------------------------------
     # Create a Pandas Excel writer using XlsxWriter as the engine.
-    writer = pd.ExcelWriter(f'Qualitron_Quality_Data.xlsx')
+    writer = pd.ExcelWriter(filename)
 
     # Write each dataframe to a different worksheet.
     df.to_excel(writer, sheet_name='General_Quality', index=False)
@@ -185,4 +213,17 @@ def qualitron_main():
 # ----------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     print('Running the Qualitron data mining process')
-    qualitron_main()
+    qualitron_main(day_filter_ini='01_01_2022', day_filter_fin='31_01_2022', filename='Qualitron_Data_Enero.xlsx')
+    qualitron_main(day_filter_ini='01_02_2022', day_filter_fin='28_02_2022', filename='Qualitron_Data_Febrero.xlsx')
+    qualitron_main(day_filter_ini='01_03_2022', day_filter_fin='31_03_2022', filename='Qualitron_Data_Marzo.xlsx')
+    qualitron_main(day_filter_ini='01_04_2022', day_filter_fin='30_04_2022', filename='Qualitron_Data_Abril.xlsx')
+    qualitron_main(day_filter_ini='01_05_2022', day_filter_fin='31_05_2022', filename='Qualitron_Data_Mayo.xlsx')
+    qualitron_main(day_filter_ini='01_06_2022', day_filter_fin='30_06_2022', filename='Qualitron_Data_Junio.xlsx')
+    qualitron_main(day_filter_ini='01_07_2022', day_filter_fin='31_07_2022', filename='Qualitron_Data_Julio.xlsx')
+    qualitron_main(day_filter_ini='01_08_2022', day_filter_fin='31_08_2022', filename='Qualitron_Data_Agosto.xlsx')
+    qualitron_main(day_filter_ini='01_09_2022', day_filter_fin='30_09_2022', filename='Qualitron_Data_Septiembre.xlsx')
+
+
+
+
+
