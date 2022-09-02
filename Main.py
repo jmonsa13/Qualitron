@@ -190,7 +190,7 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     # Export the dataframe to excel file
     # ------------------------------------------------------------------------------------------------------------------
     # Create a Pandas Excel writer using XlsxWriter as the engine.
-    writer = pd.ExcelWriter(filename)
+    writer = pd.ExcelWriter('.\\01_Resultados\\' + filename)
 
     # Write each dataframe to a different worksheet.
     df.to_excel(writer, sheet_name='General_Quality', index=False)
@@ -213,14 +213,14 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
 # ----------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     print('Running the Qualitron data mining process')
-    qualitron_main(day_filter_ini='01_01_2022', day_filter_fin='31_01_2022', filename='Qualitron_Data_Enero.xlsx')
-    qualitron_main(day_filter_ini='01_02_2022', day_filter_fin='28_02_2022', filename='Qualitron_Data_Febrero.xlsx')
-    qualitron_main(day_filter_ini='01_03_2022', day_filter_fin='31_03_2022', filename='Qualitron_Data_Marzo.xlsx')
-    qualitron_main(day_filter_ini='01_04_2022', day_filter_fin='30_04_2022', filename='Qualitron_Data_Abril.xlsx')
-    qualitron_main(day_filter_ini='01_05_2022', day_filter_fin='31_05_2022', filename='Qualitron_Data_Mayo.xlsx')
-    qualitron_main(day_filter_ini='01_06_2022', day_filter_fin='30_06_2022', filename='Qualitron_Data_Junio.xlsx')
-    qualitron_main(day_filter_ini='01_07_2022', day_filter_fin='31_07_2022', filename='Qualitron_Data_Julio.xlsx')
-    qualitron_main(day_filter_ini='01_08_2022', day_filter_fin='31_08_2022', filename='Qualitron_Data_Agosto.xlsx')
+    # qualitron_main(day_filter_ini='01_01_2022', day_filter_fin='31_01_2022', filename='Qualitron_Data_Enero.xlsx')
+    # qualitron_main(day_filter_ini='01_02_2022', day_filter_fin='28_02_2022', filename='Qualitron_Data_Febrero.xlsx')
+    # qualitron_main(day_filter_ini='01_03_2022', day_filter_fin='31_03_2022', filename='Qualitron_Data_Marzo.xlsx')
+    # qualitron_main(day_filter_ini='01_04_2022', day_filter_fin='30_04_2022', filename='Qualitron_Data_Abril.xlsx')
+    # qualitron_main(day_filter_ini='01_05_2022', day_filter_fin='31_05_2022', filename='Qualitron_Data_Mayo.xlsx')
+    # qualitron_main(day_filter_ini='01_06_2022', day_filter_fin='30_06_2022', filename='Qualitron_Data_Junio.xlsx')
+    # qualitron_main(day_filter_ini='01_07_2022', day_filter_fin='31_07_2022', filename='Qualitron_Data_Julio.xlsx')
+    # qualitron_main(day_filter_ini='01_08_2022', day_filter_fin='31_08_2022', filename='Qualitron_Data_Agosto.xlsx')
     qualitron_main(day_filter_ini='01_09_2022', day_filter_fin='30_09_2022', filename='Qualitron_Data_Septiembre.xlsx')
 
 
