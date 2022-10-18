@@ -221,7 +221,9 @@ if __name__ == '__main__':
     # qualitron_main(day_filter_ini='01_06_2022', day_filter_fin='30_06_2022', filename='Qualitron_Data_Junio.xlsx')
     # qualitron_main(day_filter_ini='01_07_2022', day_filter_fin='31_07_2022', filename='Qualitron_Data_Julio.xlsx')
     # qualitron_main(day_filter_ini='01_08_2022', day_filter_fin='31_08_2022', filename='Qualitron_Data_Agosto.xlsx')
-    qualitron_main(day_filter_ini='01_09_2022', day_filter_fin='30_09_2022', filename='Qualitron_Data_Septiembre.xlsx')
+    # qualitron_main(day_filter_ini='01_09_2022', day_filter_fin='30_09_2022', filename='Qualitron_Data_Septiembre.xlsx')
+    qualitron_main(day_filter_ini='01_10_2022', day_filter_fin='10_10_2022', filename='Qualitron_Data_Octubre.xlsx')
+
 
 
 
