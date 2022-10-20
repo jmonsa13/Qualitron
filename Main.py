@@ -156,7 +156,7 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
         print(qualitron)
 
         # Folder inside the path
-        source_dir = row['Ruta'] + ':\\'
+        source_dir = row['Ruta'] + ':\\Statistics'
         dirs = os.listdir(source_dir)
 
         # Collecting the quality data of each format inside the source folder
