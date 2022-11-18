@@ -199,6 +199,12 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     # Close the Pandas Excel writer and output the Excel file.
     writer.save()
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Export the dataframe to json format
+    # ------------------------------------------------------------------------------------------------------------------
+    df.to_json('.\\01_Resultados\\' + 'General_Quality.json', orient="records", lines=True)
+    df_quality.to_json('.\\01_Resultados\\' + 'Defects.json', orient="records", lines=True)
+
     # # Range of data
     # info_date = 'range_test'  # 'range'
     # if info_date == 'day':
@@ -222,7 +228,7 @@ if __name__ == '__main__':
     # qualitron_main(day_filter_ini='01_07_2022', day_filter_fin='31_07_2022', filename='Qualitron_Data_Julio.xlsx')
     # qualitron_main(day_filter_ini='01_08_2022', day_filter_fin='31_08_2022', filename='Qualitron_Data_Agosto.xlsx')
     # qualitron_main(day_filter_ini='01_09_2022', day_filter_fin='30_09_2022', filename='Qualitron_Data_Septiembre.xlsx')
-    qualitron_main(day_filter_ini='01_10_2022', day_filter_fin='10_10_2022', filename='Qualitron_Data_Octubre.xlsx')
+    qualitron_main(day_filter_ini='17_11_2022', day_filter_fin='17_11_2022', filename='Qualitron_Test_json.xlsx')
 
 
 
