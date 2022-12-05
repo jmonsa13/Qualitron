@@ -205,7 +205,13 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     df.to_json('.\\01_Resultados\\' + 'General_Quality.json', orient="records", lines=True)
     df_quality.to_json('.\\01_Resultados\\' + 'Defects.json', orient="records", lines=True)
 
-    # # Range of data
+    # ------------------------------------------------------------------------------------------------------------------
+    # Export the dataframe to csv format
+    # ------------------------------------------------------------------------------------------------------------------
+    df.to_csv('.\\01_Resultados\\' + 'General_Quality.csv',  index=False)
+    df_quality.to_csv('.\\01_Resultados\\' + 'Defects.csv',  index=False)
+
+    # Range of data
     # info_date = 'range_test'  # 'range'
     # if info_date == 'day':
     #     day_filter_ini = '15_05_2022'
