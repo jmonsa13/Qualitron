@@ -11,7 +11,34 @@ import pandas as pd
 
 from functions.select_files import find_type_files, find_day_files, find_range_day_files
 
+from dotenv import load_dotenv
 
+from sqlalchemy import create_engine
+from sqlalchemy.engine import URL
+
+# ----------------------------------------------------------------------------------------------------------------------
+# SQL keys definition
+# ----------------------------------------------------------------------------------------------------------------------
+# Reading secrets
+load_dotenv('./.env')
+
+server = os.environ.get("SERVER")
+database = os.environ.get("DATABASE")
+
+table_calidad = os.environ.get("TABLE_CALIDAD")
+table_defectos = os.environ.get("TABLE_DEFECTOS")
+
+username = os.environ.get("USER_SQL")
+password = os.environ.get("PASSWORD")
+
+# ----------------------------------------------------------------------------------------------------------------------
+# SQL connection definition
+# ----------------------------------------------------------------------------------------------------------------------
+# Connecting to the sql database
+connection_str = "DRIVER={SQL Server};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s" % (server, database, username, password)
+connection_url = URL.create("mssql+pyodbc", query={"odbc_connect": connection_str})
+
+conn = create_engine(connection_url)
 # ----------------------------------------------------------------------------------------------------------------------
 # Functions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -178,8 +205,8 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     # Pandas dataframe creation
     # ------------------------------------------------------------------------------------------------------------------
     # Columns name
-    general_column = ['Fecha', 'Planta', 'Qualitron', 'Producto', 'Tono', 'Calidad', 'Valor_und']
-    quality_column = ['Fecha', 'Planta', 'Qualitron', 'Producto', 'Calidad', 'Defecto', 'Valor_und']
+    general_column = ['fecha', 'planta', 'qualitron', 'producto', 'tono', 'calidad', 'valor_unidad']
+    quality_column = ['fecha', 'planta', 'qualitron', 'producto', 'calidad', 'Defecto', 'valor_unidad']
 
     # Creation of the Dataframe with general quality data
     df = pd.DataFrame(general_qual, columns=general_column)
@@ -190,26 +217,35 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     # Export the dataframe to excel file
     # ------------------------------------------------------------------------------------------------------------------
     # Create a Pandas Excel writer using XlsxWriter as the engine.
-    writer = pd.ExcelWriter('.\\01_Resultados\\' + filename)
+    # writer = pd.ExcelWriter('.\\01_Resultados\\' + filename)
 
     # Write each dataframe to a different worksheet.
-    df.to_excel(writer, sheet_name='General_Quality', index=False)
-    df_quality.to_excel(writer, sheet_name='Defects', index=False)
+    # df.to_excel(writer, sheet_name='General_Quality', index=False)
+    # df_quality.to_excel(writer, sheet_name='Defects', index=False)
 
     # Close the Pandas Excel writer and output the Excel file.
-    writer.save()
+    # writer.save()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export the dataframe to json format
     # ------------------------------------------------------------------------------------------------------------------
-    df.to_json('.\\01_Resultados\\' + 'General_Quality.json', orient="records", lines=True)
-    df_quality.to_json('.\\01_Resultados\\' + 'Defects.json', orient="records", lines=True)
+    # df.to_json('.\\01_Resultados\\' + 'General_Quality.json', orient="records", lines=True)
+    # df_quality.to_json('.\\01_Resultados\\' + 'Defects.json', orient="records", lines=True)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export the dataframe to csv format
     # ------------------------------------------------------------------------------------------------------------------
-    df.to_csv('.\\01_Resultados\\' + 'General_Quality.csv',  index=False)
-    df_quality.to_csv('.\\01_Resultados\\' + 'Defects.csv',  index=False)
+    # df.to_csv('.\\01_Resultados\\' + 'General_Quality.csv',  index=False)
+    # df_quality.to_csv('.\\01_Resultados\\' + 'Defects.csv',  index=False)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Export the dataframe to SQL DB
+    # ------------------------------------------------------------------------------------------------------------------
+    print('Sending info to calidadGeneral')
+    df.to_sql(table_calidad, conn, if_exists='append', index=False)
+
+    print('Sending info to defectosGeneral')
+    df_quality.to_sql(table_defectos, conn, if_exists='append', index=False)
 
     # Range of data
     # info_date = 'range_test'  # 'range'
@@ -226,18 +262,12 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
 if __name__ == '__main__':
     print('Running the Qualitron data mining process')
     # qualitron_main(day_filter_ini='01_01_2022', day_filter_fin='31_01_2022', filename='Qualitron_Data_Enero.xlsx')
-    # qualitron_main(day_filter_ini='01_02_2022', day_filter_fin='28_02_2022', filename='Qualitron_Data_Febrero.xlsx')
+    qualitron_main(day_filter_ini='01_02_2022', day_filter_fin='28_02_2022', filename='Qualitron_Data_Febrero.xlsx')
     # qualitron_main(day_filter_ini='01_03_2022', day_filter_fin='31_03_2022', filename='Qualitron_Data_Marzo.xlsx')
     # qualitron_main(day_filter_ini='01_04_2022', day_filter_fin='30_04_2022', filename='Qualitron_Data_Abril.xlsx')
     # qualitron_main(day_filter_ini='01_05_2022', day_filter_fin='31_05_2022', filename='Qualitron_Data_Mayo.xlsx')
     # qualitron_main(day_filter_ini='01_06_2022', day_filter_fin='30_06_2022', filename='Qualitron_Data_Junio.xlsx')
     # qualitron_main(day_filter_ini='01_07_2022', day_filter_fin='31_07_2022', filename='Qualitron_Data_Julio.xlsx')
     # qualitron_main(day_filter_ini='01_08_2022', day_filter_fin='31_08_2022', filename='Qualitron_Data_Agosto.xlsx')
-    # qualitron_main(day_filter_ini='01_09_2022', day_filter_fin='30_09_2022', filename='Qualitron_Data_Septiembre.xlsx')
-    qualitron_main(day_filter_ini='17_11_2022', day_filter_fin='17_11_2022', filename='Qualitron_Test_json.xlsx')
-
-
-
-
-
-
+    # qualitron_main(day_filter_ini='01_11_2022', day_filter_fin='30_11_2022', filename='Qualitron_Data_Noviembre.xlsx')
+    #qualitron_main(day_filter_ini='05_12_2022', day_filter_fin='05_12_2022', filename='Qualitron_Test_json.xlsx')
