@@ -131,12 +131,42 @@ def read_qualitron_files_product(source_dir, folder, planta, qualitron, type_fil
                     j = i + 3
                     flag = True
                     while flag is True:
-                        # capture value
-                        calidad_str = lines[j].split()[0]
-                        calidad_und = int(lines[j].split()[-1].strip(')'))
+                        # Capture General defect
+                        calidad_general = lines[j].split()[0]
 
-                        # Saving the data
-                        quality_data.append([fecha, planta, qualitron, folder, calidad_type, calidad_str, calidad_und])
+                        # If there is a tab. Run loop internally to get specific defects
+                        if lines[j + 1][0] == "\t":
+                            # Initial variables
+                            j += 1
+                            flag_internal = True
+
+                            while flag_internal is True:
+                                # Capture Values
+                                calidad_str = lines[j].split()[0]
+                                calidad_und = int(lines[j].split()[-1].strip(')'))
+
+                                # Saving the data
+                                quality_data.append(
+                                    [fecha, planta, qualitron, folder, calidad_type, calidad_general,
+                                     calidad_str, calidad_und])
+
+                                # Contador
+                                j += 1
+
+                                # Exit loop - Checking for a
+                                if lines[j][0] != "\t":
+                                    flag_internal = False
+                                    j -= 1
+
+                        # If there is not "tab" get de value and save the defect
+                        else:
+                            # Capture General defect value
+                            calidad_str = ""
+                            calidad_und = int(lines[j].split()[-1].strip(')'))
+
+                            # Saving the data
+                            quality_data.append([fecha, planta, qualitron, folder, calidad_type, calidad_general,
+                                                 calidad_str, calidad_und])
 
                         # Contador
                         j += 1
@@ -206,7 +236,8 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     # ------------------------------------------------------------------------------------------------------------------
     # Columns name
     general_column = ['fecha', 'planta', 'qualitron', 'producto', 'tono', 'calidad', 'valor_unidad']
-    quality_column = ['fecha', 'planta', 'qualitron', 'producto', 'calidad', 'Defecto', 'valor_unidad']
+    quality_column = ['fecha', 'planta', 'qualitron', 'producto', 'calidad', 'defecto', 'defecto_especifico',
+                      'valor_unidad']
 
     # Creation of the Dataframe with general quality data
     df = pd.DataFrame(general_qual, columns=general_column)
@@ -217,14 +248,14 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     # Export the dataframe to excel file
     # ------------------------------------------------------------------------------------------------------------------
     # Create a Pandas Excel writer using XlsxWriter as the engine.
-    # writer = pd.ExcelWriter('.\\01_Resultados\\' + filename)
+    writer = pd.ExcelWriter('.\\01_Resultados\\' + filename)
 
     # Write each dataframe to a different worksheet.
-    # df.to_excel(writer, sheet_name='General_Quality', index=False)
-    # df_quality.to_excel(writer, sheet_name='Defects', index=False)
+    df.to_excel(writer, sheet_name='General_Quality', index=False)
+    df_quality.to_excel(writer, sheet_name='Defects', index=False)
 
     # Close the Pandas Excel writer and output the Excel file.
-    # writer.save()
+    writer.save()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export the dataframe to json format
@@ -261,13 +292,4 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
 # ----------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     print('Running the Qualitron data mining process')
-    # qualitron_main(day_filter_ini='01_01_2022', day_filter_fin='31_01_2022', filename='Qualitron_Data_Enero.xlsx')
-    qualitron_main(day_filter_ini='01_02_2022', day_filter_fin='28_02_2022', filename='Qualitron_Data_Febrero.xlsx')
-    # qualitron_main(day_filter_ini='01_03_2022', day_filter_fin='31_03_2022', filename='Qualitron_Data_Marzo.xlsx')
-    # qualitron_main(day_filter_ini='01_04_2022', day_filter_fin='30_04_2022', filename='Qualitron_Data_Abril.xlsx')
-    # qualitron_main(day_filter_ini='01_05_2022', day_filter_fin='31_05_2022', filename='Qualitron_Data_Mayo.xlsx')
-    # qualitron_main(day_filter_ini='01_06_2022', day_filter_fin='30_06_2022', filename='Qualitron_Data_Junio.xlsx')
-    # qualitron_main(day_filter_ini='01_07_2022', day_filter_fin='31_07_2022', filename='Qualitron_Data_Julio.xlsx')
-    # qualitron_main(day_filter_ini='01_08_2022', day_filter_fin='31_08_2022', filename='Qualitron_Data_Agosto.xlsx')
-    # qualitron_main(day_filter_ini='01_11_2022', day_filter_fin='30_11_2022', filename='Qualitron_Data_Noviembre.xlsx')
-    #qualitron_main(day_filter_ini='05_12_2022', day_filter_fin='05_12_2022', filename='Qualitron_Test_json.xlsx')
+    qualitron_main(day_filter_ini='01_01_2023', day_filter_fin='05_01_2023', filename='Qualitron_Enero_2023.xlsx')
