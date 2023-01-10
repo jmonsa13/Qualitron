@@ -161,7 +161,7 @@ def read_qualitron_files_product(source_dir, folder, planta, qualitron, type_fil
                         # If there is not "tab" get de value and save the defect
                         else:
                             # Capture General defect value
-                            calidad_str = ""
+                            calidad_str = "_"
                             calidad_und = int(lines[j].split()[-1].strip(')'))
 
                             # Saving the data
@@ -272,11 +272,11 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     # ------------------------------------------------------------------------------------------------------------------
     # Export the dataframe to SQL DB
     # ------------------------------------------------------------------------------------------------------------------
-    print('Sending info to calidadGeneral')
-    df.to_sql(table_calidad, conn, if_exists='append', index=False)
+    # print('Sending info to calidadGeneral')
+    # df.to_sql(table_calidad, conn, if_exists='append', index=False)
 
-    print('Sending info to defectosGeneral')
-    df_quality.to_sql(table_defectos, conn, if_exists='append', index=False)
+    # print('Sending info to defectosGeneral')
+    # df_quality.to_sql(table_defectos, conn, if_exists='append', index=False)
 
     # Range of data
     # info_date = 'range_test'  # 'range'
@@ -292,4 +292,4 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
 # ----------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     print('Running the Qualitron data mining process')
-    qualitron_main(day_filter_ini='01_01_2023', day_filter_fin='05_01_2023', filename='Qualitron_Enero_2023.xlsx')
+    qualitron_main(day_filter_ini='10_01_2023', day_filter_fin='10_01_2023', filename='Qualitron_Enero_2023_10.xlsx')
