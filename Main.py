@@ -12,10 +12,7 @@ import pandas as pd
 from functions.select_files import find_type_files, find_day_files, find_range_day_files
 
 from dotenv import load_dotenv
-
-from sqlalchemy import create_engine
-from sqlalchemy.engine import URL
-
+import pyodbc
 # ----------------------------------------------------------------------------------------------------------------------
 # SQL keys definition
 # ----------------------------------------------------------------------------------------------------------------------
@@ -36,9 +33,9 @@ password = os.environ.get("PASSWORD")
 # ----------------------------------------------------------------------------------------------------------------------
 # Connecting to the sql database
 connection_str = "DRIVER={SQL Server};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s" % (server, database, username, password)
-connection_url = URL.create("mssql+pyodbc", query={"odbc_connect": connection_str})
 
-conn = create_engine(connection_url)
+# Connect to SQL Server
+conn = pyodbc.connect(connection_str)
 # ----------------------------------------------------------------------------------------------------------------------
 # Functions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -266,30 +263,58 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     # ------------------------------------------------------------------------------------------------------------------
     # Export the dataframe to csv format
     # ------------------------------------------------------------------------------------------------------------------
-    # df.to_csv('.\\01_Resultados\\' + 'General_Quality.csv',  index=False)
-    # df_quality.to_csv('.\\01_Resultados\\' + 'Defects.csv',  index=False)
+    # df.to_csv('.\\01_Resultados\\' + 'General_Quality_enero_2023.csv',  index=False)
+    # df_quality.to_csv('.\\01_Resultados\\' + 'Defects_enero_2023.csv',  index=False)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export the dataframe to SQL DB
     # ------------------------------------------------------------------------------------------------------------------
-    # print('Sending info to calidadGeneral')
-    # df.to_sql(table_calidad, conn, if_exists='append', index=False)
+    print('Sending info to calidadGeneral')
 
-    # print('Sending info to defectosGeneral')
-    # df_quality.to_sql(table_defectos, conn, if_exists='append', index=False)
+    # Initialization cursor
+    cursor = conn.cursor()
 
-    # Range of data
-    # info_date = 'range_test'  # 'range'
-    # if info_date == 'day':
-    #     day_filter_ini = '15_05_2022'
-    # elif info_date == 'range':
-    #     day_filter_fin = convert_date_format(datetime.date.today())
-    #     day_filter_ini = convert_date_format(datetime.date.today() - datetime.timedelta(days=1))
-    # elif info_date == 'range_test':
-    #     day_filter_ini = '20_05_2022'
-    #     day_filter_fin = '05_06_2022'
+    # Insert DataFrame to Table
+    for row in df.itertuples():
+        cursor.execute('''
+                    INSERT INTO calidadGeneral (fecha, planta, qualitron, producto, tono, calidad, valor_unidad)
+                    VALUES (?,?,?,?,?,?,?)
+                    ''',
+                       row.fecha,
+                       row.planta,
+                       row.qualitron,
+                       row.producto,
+                       row.tono,
+                       row.calidad,
+                       row.valor_unidad
+                       )
+    conn.commit()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    print('Sending info to defectosGeneral')
+
+    # Initialization cursor
+    cursor = conn.cursor()
+
+    # Insert DataFrame to Table
+    for row in df_quality.itertuples():
+        cursor.execute('''
+                    INSERT INTO defectosGeneral (fecha, planta, qualitron, producto, calidad, defecto,
+                     defecto_especifico, valor_unidad)
+                    VALUES (?,?,?,?,?,?,?, ?)
+                    ''',
+                       row.fecha,
+                       row.planta,
+                       row.qualitron,
+                       row.producto,
+                       row.calidad,
+                       row.defecto,
+                       row.defecto_especifico,
+                       row.valor_unidad
+                       )
+    conn.commit()
 
 # ----------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     print('Running the Qualitron data mining process')
-    qualitron_main(day_filter_ini='10_01_2023', day_filter_fin='10_01_2023', filename='Qualitron_Enero_2023_10.xlsx')
+    qualitron_main(day_filter_ini='30_01_2023', day_filter_fin='30_01_2023', filename='Prestigio_Qualitron_Enero_2023_30.xlsx')
