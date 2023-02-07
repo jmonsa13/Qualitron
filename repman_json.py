@@ -81,6 +81,17 @@ def repman_json_calidad(df, filename, folder):
                 # Creating the header nested data
                 file.write(f'"Cantidades":[\n')
 
+                # Writing the nested data
+                file.write(f'\t{{\n\t"Tono":"{row["tono"]}",\n\t"Calidad":"{row["calidad"]}",\n\t'
+                           f'"Valor_und":{row["valor_unidad"]}}}')
+
+                # Check if next row is different to avoid the trailing coma
+                if index + 1 < len(df) and fecha == datetime.timestamp(df.iloc[index + 1]['fecha']) \
+                        and planta == df.iloc[index + 1]["planta"] and qualitron == df.iloc[index + 1]['qualitron'] \
+                        and producto == df.iloc[index + 1]['producto']:
+                    # Add the coma
+                    file.write(',\n')
+
         # Closing the json file
         file.write(f']\n')
         file.write(f'}}]')
@@ -93,5 +104,5 @@ def repman_json_calidad(df, filename, folder):
 # Main for testing the function
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-df = pd.read_excel('.\\01_Resultados\\Prestigio_Qualitron_Enero_2023_24.xlsx')
-repman_json_calidad(df, 'General_Quality.json', '.\\01_Resultados\\')
+# df = pd.read_excel('.\\01_Resultados\\Prestigio_Qualitron_Enero_2023_24.xlsx')
+# repman_json_calidad(df, 'General_Quality.json', '.\\01_Resultados\\')
