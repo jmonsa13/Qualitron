@@ -13,6 +13,8 @@ from functions.select_files import find_type_files, find_day_files, find_range_d
 
 from dotenv import load_dotenv
 import pyodbc
+
+from repman_json import repman_json_calidad, repman_json_defectos
 # ----------------------------------------------------------------------------------------------------------------------
 # SQL keys definition
 # ----------------------------------------------------------------------------------------------------------------------
@@ -245,7 +247,7 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     # Export the dataframe to excel file
     # ------------------------------------------------------------------------------------------------------------------
     # Create a Pandas Excel writer using XlsxWriter as the engine.
-    writer = pd.ExcelWriter('.\\01_Resultados\\' + filename)
+    writer = pd.ExcelWriter('.\\01_Resultados\\' + filename + '.xlsx')
 
     # Write each dataframe to a different worksheet.
     df.to_excel(writer, sheet_name='General_Quality', index=False)
@@ -257,8 +259,8 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     # ------------------------------------------------------------------------------------------------------------------
     # Export the dataframe to json format
     # ------------------------------------------------------------------------------------------------------------------
-    # df.to_json('.\\01_Resultados\\' + 'General_Quality.json', orient="records", lines=True)
-    # df_quality.to_json('.\\01_Resultados\\' + 'Defects.json', orient="records", lines=True)
+    repman_json_calidad(df, filename + '_calidad.json', '.\\01_Resultados\\')
+    repman_json_defectos(df_quality, filename + '_defectos.json', '.\\01_Resultados\\')
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export the dataframe to csv format
@@ -269,52 +271,52 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     # ------------------------------------------------------------------------------------------------------------------
     # Export the dataframe to SQL DB
     # ------------------------------------------------------------------------------------------------------------------
-    print('Sending info to calidadGeneral')
-
-    # Initialization cursor
-    cursor = conn.cursor()
-
-    # Insert DataFrame to Table
-    for row in df.itertuples():
-        cursor.execute('''
-                    INSERT INTO calidadGeneral (fecha, planta, qualitron, producto, tono, calidad, valor_unidad)
-                    VALUES (?,?,?,?,?,?,?)
-                    ''',
-                       row.fecha,
-                       row.planta,
-                       row.qualitron,
-                       row.producto,
-                       row.tono,
-                       row.calidad,
-                       row.valor_unidad
-                       )
-    conn.commit()
-
-    # ------------------------------------------------------------------------------------------------------------------
-    print('Sending info to defectosGeneral')
-
-    # Initialization cursor
-    cursor = conn.cursor()
-
-    # Insert DataFrame to Table
-    for row in df_quality.itertuples():
-        cursor.execute('''
-                    INSERT INTO defectosGeneral (fecha, planta, qualitron, producto, calidad, defecto,
-                     defecto_especifico, valor_unidad)
-                    VALUES (?,?,?,?,?,?,?, ?)
-                    ''',
-                       row.fecha,
-                       row.planta,
-                       row.qualitron,
-                       row.producto,
-                       row.calidad,
-                       row.defecto,
-                       row.defecto_especifico,
-                       row.valor_unidad
-                       )
-    conn.commit()
+    # print('Sending info to calidadGeneral')
+    #
+    # # Initialization cursor
+    # cursor = conn.cursor()
+    #
+    # # Insert DataFrame to Table
+    # for row in df.itertuples():
+    #     cursor.execute('''
+    #                 INSERT INTO calidadGeneral (fecha, planta, qualitron, producto, tono, calidad, valor_unidad)
+    #                 VALUES (?,?,?,?,?,?,?)
+    #                 ''',
+    #                    row.fecha,
+    #                    row.planta,
+    #                    row.qualitron,
+    #                    row.producto,
+    #                    row.tono,
+    #                    row.calidad,
+    #                    row.valor_unidad
+    #                    )
+    # conn.commit()
+    #
+    # # ------------------------------------------------------------------------------------------------------------------
+    # print('Sending info to defectosGeneral')
+    #
+    # # Initialization cursor
+    # cursor = conn.cursor()
+    #
+    # # Insert DataFrame to Table
+    # for row in df_quality.itertuples():
+    #     cursor.execute('''
+    #                 INSERT INTO defectosGeneral (fecha, planta, qualitron, producto, calidad, defecto,
+    #                  defecto_especifico, valor_unidad)
+    #                 VALUES (?,?,?,?,?,?,?, ?)
+    #                 ''',
+    #                    row.fecha,
+    #                    row.planta,
+    #                    row.qualitron,
+    #                    row.producto,
+    #                    row.calidad,
+    #                    row.defecto,
+    #                    row.defecto_especifico,
+    #                    row.valor_unidad
+    #                    )
+    # conn.commit()
 
 # ----------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     print('Running the Qualitron data mining process')
-    qualitron_main(day_filter_ini='30_01_2023', day_filter_fin='30_01_2023', filename='Prestigio_Qualitron_Enero_2023_30.xlsx')
+    qualitron_main(day_filter_ini='01_02_2023', day_filter_fin='05_02_2023', filename='Prestigio_Qualitron_Feb_2023')
