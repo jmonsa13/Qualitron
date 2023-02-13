@@ -35,10 +35,10 @@ def repman_json_calidad(df, filename, folder):
 
         # Initial part of the row
         file.write(
-            f'[{{\n"Fecha":{fecha},\n"Planta":"{planta}",\n"Qualitron":"{qualitron}",\n"Producto":"{producto}",\n')
+            f'[{{\n"fecha":{fecha},\n"planta":"{planta}",\n"qualitron":"{qualitron}",\n"producto":"{producto}",\n')
 
         # Creating the header nested Header
-        file.write(f'"Cantidades":[\n')
+        file.write(f'"cantidades":[\n')
         # --------------------------------------------------------------------------------------------------------------
         # Looping the df
         # --------------------------------------------------------------------------------------------------------------
@@ -48,8 +48,8 @@ def repman_json_calidad(df, filename, folder):
                     row['qualitron'] and producto == row['producto']:
 
                 # Writing the nested data
-                file.write(f'\t{{\n\t"Tono":"{row["tono"]}",\n\t"Calidad":"{row["calidad"]}",\n\t'
-                           f'"Valor_und":{row["valor_unidad"]}}}')
+                file.write(f'\t{{\n\t"tono":"{row["tono"]}",\n\t"calidad":"{row["calidad"]}",\n\t'
+                           f'"valorUnd":{row["valor_unidad"]}}}')
 
                 # Check if next row is different to avoid the trailing coma
                 if index + 1 < len(df) and fecha == datetime.timestamp(df.iloc[index + 1]['fecha']) \
@@ -75,15 +75,15 @@ def repman_json_calidad(df, filename, folder):
 
                 # Initial part of the row
                 file.write(
-                    f'{{\n"Fecha":{fecha},\n"Planta":"{planta}",\n"Qualitron":"{qualitron}",'
-                    f'\n"Producto":"{producto}",\n')
+                    f'{{\n"fecha":{fecha},\n"planta":"{planta}",\n"qualitron":"{qualitron}",'
+                    f'\n"producto":"{producto}",\n')
 
                 # Creating the header nested data
-                file.write(f'"Cantidades":[\n')
+                file.write(f'"cantidades":[\n')
 
                 # Writing the nested data
-                file.write(f'\t{{\n\t"Tono":"{row["tono"]}",\n\t"Calidad":"{row["calidad"]}",\n\t'
-                           f'"Valor_und":{row["valor_unidad"]}}}')
+                file.write(f'\t{{\n\t"tono":"{row["tono"]}",\n\t"calidad":"{row["calidad"]}",\n\t'
+                           f'"valorUnd":{row["valor_unidad"]}}}')
 
                 # Check if next row is different to avoid the trailing coma
                 if index + 1 < len(df) and fecha == datetime.timestamp(df.iloc[index + 1]['fecha']) \
@@ -122,10 +122,10 @@ def repman_json_defectos(df, filename, folder):
 
         # Initial part of the row
         file.write(
-            f'[{{\n"Fecha":{fecha},\n"Planta":"{planta}",\n"Qualitron":"{qualitron}",\n"Producto":"{producto}",\n')
+            f'[{{\n"fecha":{fecha},\n"planta":"{planta}",\n"qualitron":"{qualitron}",\n"producto":"{producto}",\n')
 
         # Creating the header nested Header
-        file.write(f'"Cantidades":[\n')
+        file.write(f'"cantidades":[\n')
         # --------------------------------------------------------------------------------------------------------------
         # Looping the df
         # --------------------------------------------------------------------------------------------------------------
@@ -135,9 +135,9 @@ def repman_json_defectos(df, filename, folder):
                     row['qualitron'] and producto == row['producto']:
 
                 # Writing the nested data
-                file.write(f'\t{{\n\t"Calidad":"{row["calidad"]}",\n\t"Defecto":"{row["defecto"]}",'
-                           f'\n\t"Defecto_Especifico":"{row["defecto_especifico"]}",\n\t'
-                           f'"Valor_und":{row["valor_unidad"]}}}')
+                file.write(f'\t{{\n\t"calidad":"{row["calidad"]}",\n\t"defecto":"{row["defecto"]}",'
+                           f'\n\t"defectoEspecifico":"{row["defecto_especifico"]}",\n\t'
+                           f'"valorUnd":{row["valor_unidad"]}}}')
 
                 # Check if next row is different to avoid the trailing coma
                 if index + 1 < len(df) and fecha == datetime.timestamp(df.iloc[index + 1]['fecha']) \
@@ -163,16 +163,16 @@ def repman_json_defectos(df, filename, folder):
 
                 # Initial part of the row
                 file.write(
-                    f'{{\n"Fecha":{fecha},\n"Planta":"{planta}",\n"Qualitron":"{qualitron}",'
-                    f'\n"Producto":"{producto}",\n')
+                    f'{{\n"fecha":{fecha},\n"planta":"{planta}",\n"qualitron":"{qualitron}",'
+                    f'\n"producto":"{producto}",\n')
 
                 # Creating the header nested data
-                file.write(f'"Cantidades":[\n')
+                file.write(f'"cantidades":[\n')
 
                 # Writing the nested data
-                file.write(f'\t{{\n\t"Calidad":"{row["calidad"]}",\n\t"Defecto":"{row["defecto"]}",'
-                           f'\n\t"Defecto_Especifico":"{row["defecto_especifico"]}",\n\t'
-                           f'"Valor_und":{row["valor_unidad"]}}}')
+                file.write(f'\t{{\n\t"calidad":"{row["calidad"]}",\n\t"defecto":"{row["defecto"]}",'
+                           f'\n\t"defectoEspecifico":"{row["defecto_especifico"]}",\n\t'
+                           f'"valorUnd":{row["valor_unidad"]}}}')
 
                 # Check if next row is different to avoid the trailing coma
                 if index + 1 < len(df) and fecha == datetime.timestamp(df.iloc[index + 1]['fecha']) \
@@ -194,6 +194,6 @@ def repman_json_defectos(df, filename, folder):
 # ----------------------------------------------------------------------------------------------------------------------
 # df = pd.read_excel('.\\01_Resultados\\Prestigio_Qualitron_Feb_2023.xlsx', sheet_name=0)
 # repman_json_calidad(df, 'General_calidad.json', '.\\01_Resultados\\')
-
+#
 # df = pd.read_excel('.\\01_Resultados\\Prestigio_Qualitron_Feb_2023.xlsx', sheet_name=1)
 # repman_json_defectos(df, 'General_defectos.json', '.\\01_Resultados\\')
