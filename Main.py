@@ -12,7 +12,8 @@ import pandas as pd
 from functions.select_files import find_type_files, find_day_files, find_range_day_files
 
 from dotenv import load_dotenv
-import pyodbc
+from sqlalchemy import create_engine
+from sqlalchemy.engine import URL
 
 from repman_json import repman_json_calidad, repman_json_defectos
 # ----------------------------------------------------------------------------------------------------------------------
@@ -35,9 +36,9 @@ password = os.environ.get("PASSWORD")
 # ----------------------------------------------------------------------------------------------------------------------
 # Connecting to the sql database
 connection_str = "DRIVER={SQL Server};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s" % (server, database, username, password)
+connection_url = URL.create("mssql+pyodbc", query={"odbc_connect": connection_str})
 
-# Connect to SQL Server
-conn = pyodbc.connect(connection_str)
+conn = create_engine(connection_url)
 # ----------------------------------------------------------------------------------------------------------------------
 # Functions
 # ----------------------------------------------------------------------------------------------------------------------
@@ -263,60 +264,15 @@ def qualitron_main(day_filter_ini, day_filter_fin, filename):
     repman_json_defectos(df_quality, filename + '_defectos.json', '.\\01_Resultados\\')
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Export the dataframe to csv format
-    # ------------------------------------------------------------------------------------------------------------------
-    # df.to_csv('.\\01_Resultados\\' + 'General_Quality_enero_2023.csv',  index=False)
-    # df_quality.to_csv('.\\01_Resultados\\' + 'Defects_enero_2023.csv',  index=False)
-
-    # ------------------------------------------------------------------------------------------------------------------
     # Export the dataframe to SQL DB
     # ------------------------------------------------------------------------------------------------------------------
-    # print('Sending info to calidadGeneral')
-    #
-    # # Initialization cursor
-    # cursor = conn.cursor()
-    #
-    # # Insert DataFrame to Table
-    # for row in df.itertuples():
-    #     cursor.execute('''
-    #                 INSERT INTO calidadGeneral (fecha, planta, qualitron, producto, tono, calidad, valor_unidad)
-    #                 VALUES (?,?,?,?,?,?,?)
-    #                 ''',
-    #                    row.fecha,
-    #                    row.planta,
-    #                    row.qualitron,
-    #                    row.producto,
-    #                    row.tono,
-    #                    row.calidad,
-    #                    row.valor_unidad
-    #                    )
-    # conn.commit()
-    #
-    # # ------------------------------------------------------------------------------------------------------------------
-    # print('Sending info to defectosGeneral')
-    #
-    # # Initialization cursor
-    # cursor = conn.cursor()
-    #
-    # # Insert DataFrame to Table
-    # for row in df_quality.itertuples():
-    #     cursor.execute('''
-    #                 INSERT INTO defectosGeneral (fecha, planta, qualitron, producto, calidad, defecto,
-    #                  defecto_especifico, valor_unidad)
-    #                 VALUES (?,?,?,?,?,?,?, ?)
-    #                 ''',
-    #                    row.fecha,
-    #                    row.planta,
-    #                    row.qualitron,
-    #                    row.producto,
-    #                    row.calidad,
-    #                    row.defecto,
-    #                    row.defecto_especifico,
-    #                    row.valor_unidad
-    #                    )
-    # conn.commit()
+    print('Sending info to calidadGeneral')
+    df.to_sql(table_calidad, conn, if_exists='append', index=False)
+
+    print('Sending info to defectosGeneral')
+    df_quality.to_sql(table_defectos, conn, if_exists='append', index=False)
 
 # ----------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     print('Running the Qualitron data mining process')
-    qualitron_main(day_filter_ini='01_02_2023', day_filter_fin='05_02_2023', filename='Prestigio_Qualitron_Feb_2023')
+    qualitron_main(day_filter_ini='28_02_2023', day_filter_fin='28_02_2023', filename='Prestigio_Qualitron_Feb_2023')
